@@ -57,7 +57,6 @@ onMount(() => {
 			],
 			"source": "slopes",
 			"source-layer": "tlm_strasse_slope",
-			"id": "slopes",
 		};
 
 		const isLinestring = [ '==', [ 'geometry-type' ], 'LineString'];
@@ -66,30 +65,34 @@ onMount(() => {
 			'filter': [ 'all',
 				isLinestring,
 				isPath,
-			]
+			],
+			"id": "slopes_path",
 		}), "road_path");
 		map.addLayer(Object.assign({}, slopeStyle, {
 			'filter': [ 'all',
 				isLinestring,
 				["!", isPath],
 			],
-			"id": "slopes2",
+			"id": "slopes_street",
 		}), "building_2d");
 
 		const popup = new Popup({
 			closeButton: false,
 			closeOnClick: false
 		});
-		map.on('mouseenter', 'slopes', function (e) {
-			map.getCanvas().style.cursor = 'pointer';
-			var description = 'Slope: ' + Math.round(e.features[0].properties.slope * 100) + '%';
-			popup.setLngLat(e.lngLat).setHTML(description).addTo(map);
-		});
 
-		map.on('mouseleave', 'slopes', function () {
-			map.getCanvas().style.cursor = '';
-			popup.remove();
-		});
+		for (const layerId of ['slopes_path', 'slopes_street']) {
+			map.on('mouseenter', layerId, function (e) {
+				map.getCanvas().style.cursor = 'pointer';
+				var description = 'Slope: ' + Math.round(e.features[0].properties.slope * 100) + '%';
+				popup.setLngLat(e.lngLat).setHTML(description).addTo(map);
+			});
+
+			map.on('mouseleave', layerId, function () {
+				map.getCanvas().style.cursor = '';
+				popup.remove();
+			});
+		}
 	});
 
 	map.addControl(
