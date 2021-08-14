@@ -9,7 +9,7 @@ onMount(() => {
 	const map = new Map({
 		container: mapDiv,
 		style: 'https://vectortiles.geo.admin.ch/styles/ch.swisstopo.leichte-basiskarte.vt/style.json',
-		center: [8.85, 47.49],
+		center: [8.94122, 47.3709],
 		zoom: 15,
 		hash: true
 	})
