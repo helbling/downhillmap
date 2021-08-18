@@ -1,7 +1,7 @@
 <script>
 
 import { onMount } from 'svelte';
-import { Map, GeolocateControl, Popup } from 'maplibre-gl'
+import { Map, AttributionControl, GeolocateControl, Popup } from 'maplibre-gl'
 
 let mapDiv;
 
@@ -11,7 +11,14 @@ onMount(() => {
 		style: 'https://vectortiles.geo.admin.ch/styles/ch.swisstopo.leichte-basiskarte.vt/style.json',
 		center: [8.94122, 47.3709],
 		zoom: 15,
-		hash: true
+		maxBounds: [
+			5.9559,
+			45.818,
+			10.4921,
+			47.8084
+		],
+		hash: true,
+		attributionControl: false, // added manually further down
 	})
 
 	const lineColor = [
@@ -104,7 +111,13 @@ onMount(() => {
 		  enableHighAccuracy: true
 		},
 	  })
-	)
+	);
+
+	map.addControl(
+		new AttributionControl({
+			compact: false,
+		})
+	);
 });
 </script>
 
