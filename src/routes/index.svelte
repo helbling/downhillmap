@@ -86,6 +86,25 @@ onMount(() => {
 			"id": "slopes_street",
 		}), "building_2d");
 
+		map.addLayer({
+			"id": "slopes_text",
+			"type": "symbol",
+			'minzoom': 18,
+			"layout": {
+				"text-field": ['concat', ['to-string', ['round', ['*', 100, ['get', 'slope']]]], '%'],
+				"symbol-placement": "line-center",
+				"text-font": ["Frutiger Neue Regular"],
+				"text-size": 16,
+			},
+			"paint": {
+				'text-halo-blur':0,
+				'text-halo-color':'#fff',
+				'text-halo-width':2,
+			},
+			"source": "slopes",
+			"source-layer": "tlm_strasse_slope",
+		});
+
 		const popup = new Popup({
 			closeButton: false,
 			closeOnClick: false
