@@ -31,7 +31,10 @@ onMount(() => {
 	map.on('load', () => {
 		map.addSource('slopes', {
 			"type": "vector",
-			// TODO: put tlm_strasse_slope tile source here!
+			"scheme": "tms",
+			"tiles": [ document.location.origin + "/tile/{z}/{x}/{y}"],
+			"minzoom": 10,
+			"maxzoom": 18
 		});
 
 		const slopeStyle = {
