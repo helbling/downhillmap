@@ -39,7 +39,7 @@ onMount(() => {
 		map.addSource('slopes', {
 			"type": "vector",
 			"scheme": "tms",
-			"tiles": [ document.location.origin + "/tile/{z}/{x}/{y}"],
+			"tiles": [ document.location.origin + "/tile/{z}/{x}/{y}"], // NOTE for develpment: uncomment scheme:tms and use "http://localhost:3000/tile?z={z}&x={x}&y={y}"
 			"minzoom": 10,
 			"maxzoom": 18
 		});
