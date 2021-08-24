@@ -71,7 +71,7 @@ onMount(() => {
 
 		const isLinestring = [ '==', [ 'geometry-type' ], 'LineString'];
 		const isPath = ['any',
-			[ 'in', [ 'get', 'objektart'], ['literal', ['1m Weg', '1m Wegfragment', 'Klettersteig']]],
+			[ 'in', [ 'get', 'objektart'], ['literal', ['1m Weg', '1m Wegfragment', 'Klettersteig', 'Markierte Spur']]],
 			[ 'all',
 				[ 'in', [ 'get', 'objektart'], ['literal', ['2m Weg', '2m Wegfragment']]],
 				[ 'in', [ 'get', 'belagsart'], ['literal', ['Natur', 'k_W']]],
