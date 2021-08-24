@@ -70,7 +70,14 @@ onMount(() => {
 		};
 
 		const isLinestring = [ '==', [ 'geometry-type' ], 'LineString'];
-		const isPath = [ 'in', [ 'get', 'objektart'], ['literal', ['1m Weg', '1m Wegfragment', '2m Weg', '2m Wegfragment', 'Klettersteig']]];
+		const isPath = ['any',
+			[ 'in', [ 'get', 'objektart'], ['literal', ['1m Weg', '1m Wegfragment', 'Klettersteig']]],
+			[ 'all',
+				[ 'in', [ 'get', 'objektart'], ['literal', ['2m Weg', '2m Wegfragment']]],
+				[ 'in', [ 'get', 'belagsart'], ['literal', ['Natur', 'k_W']]],
+			],
+		];
+
 		map.addLayer(Object.assign({}, slopeStyle, {
 			'filter': [ 'all',
 				isLinestring,
