@@ -68,13 +68,13 @@ onMount(() => {
 			"type": "vector",
 			"scheme": "tms",
 			"tiles": [ document.location.origin + "/tile/{z}/{x}/{y}"], // NOTE for develpment: uncomment scheme:tms and use "http://localhost:3000/tile?z={z}&x={x}&y={y}"
-			"minzoom": 10,
+			"minzoom": 12,
 			"maxzoom": 18
 		});
 
 		const slopeStyle = {
 			"type": "line",
-			'minzoom': 12,
+			'minzoom': 13,
 			"paint": {
 				"line-width": [
 					'interpolate',
