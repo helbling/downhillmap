@@ -43,7 +43,7 @@
 		</ul>
 
 		<p>
-			Many thanks to everyone who make the <a href="https://www.swisstopo.admin.ch/en/swisstopo/free-geodata.html">Open Government Data (OGD) strategy </a> possible!
+			Many thanks to everyone who made the <a href="https://www.swisstopo.admin.ch/en/swisstopo/free-geodata.html">Open Government Data (OGD) strategy </a> possible!
 		</p>
 
 		<p>
