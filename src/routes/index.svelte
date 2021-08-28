@@ -1,7 +1,7 @@
 <script>
 
 import { onMount } from 'svelte';
-import { Map, AttributionControl, GeolocateControl, Popup } from 'maplibre-gl'
+import { Map, AttributionControl, GeolocateControl, ScaleControl, Popup } from 'maplibre-gl'
 
 class AboutButton {
 	onAdd(map) {
@@ -173,6 +173,7 @@ onMount(() => {
 		})
 	);
 
+	map.addControl(new ScaleControl());
 	map.addControl(new AboutButton());
 
 });
