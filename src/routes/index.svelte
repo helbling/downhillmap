@@ -3,6 +3,34 @@
 import { onMount } from 'svelte';
 import { Map, AttributionControl, GeolocateControl, Popup } from 'maplibre-gl'
 
+class AboutButton {
+	onAdd(map) {
+		this._map = map;
+		/*
+		const span = document.createElement('span');
+		span.className = 'maplibregl-ctrl-attrib-button';
+		 */
+
+		const button = document.createElement('button');
+		button.className = 'about-button';
+		button.insertAdjacentHTML(
+			'beforeend',
+			`<a href='/about'><svg width='24' height='24' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill-rule='evenodd'><path d='M4 10a6 6 0 1012 0 6 6 0 10-12 0m5-3a1 1 0 102 0 1 1 0 10-2 0m0 3a1 1 0 112 0v3a1 1 0 11-2 0'/></svg></span></a>`
+		);
+
+		this._container = document.createElement('div');
+		this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group';
+		this._container.appendChild(button);
+
+		return this._container;
+	}
+
+	onRemove() {
+		this._container.parentNode.removeChild(this._container);
+		this._map = undefined;
+	}
+}
+
 let mapDiv;
 
 onMount(() => {
@@ -144,6 +172,9 @@ onMount(() => {
 			compact: false,
 		})
 	);
+
+	map.addControl(new AboutButton());
+
 });
 </script>
 
@@ -153,11 +184,19 @@ onMount(() => {
 
 <style>
 	.map {
-	  position: absolute;
-	  top: 0;
-	  bottom: 0;
-	  left: 0;
-	  right: 0;
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+	}
+	:global(.about-button a) {
+		width:100%;
+		height:100%;
+		display:inline-block;
+	}
+	:global(.about-button svg) {
+		margin-top:2.5px;
 	}
 </style>
 
