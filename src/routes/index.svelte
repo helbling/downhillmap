@@ -121,6 +121,37 @@ onMount(() => {
 			"id": "slopes_street",
 		}), "building_2d");
 
+
+		// distinguish steps from paths
+		const roadPath = map.getLayer('road_path');
+		if (roadPath) {
+			const roadPathFilter = roadPath.filter.slice(); // clone
+			map.setFilter('road_path', ['all', roadPathFilter, ['!=', ['get', 'subclass'], 'steps']]);
+			
+			const steps = {
+				id: 'steps',
+				filter: ['all', roadPathFilter, ['==', ['get', 'subclass'], 'steps']]	,
+				type: "line",
+				source: "swissmaptiles",
+				"source-layer": "transportation",
+				minzoom: 14,
+				layout: {
+					"line-cap": "butt",
+					"line-join": "bevel",
+					"visibility": "visible"
+				},
+				paint: {
+					'line-blur': map.getPaintProperty('road_path', 'line-blur'),
+					'line-color': map.getPaintProperty('road_path', 'line-color'),
+					'line-opacity': map.getPaintProperty('road_path', 'line-opacity'),
+					'line-width': map.getPaintProperty('road_path', 'line-width'),
+					'line-dasharray': [1, 1],
+				},
+			};
+			map.addLayer(steps, 'road_path');
+			map.moveLayer('slopes_path', 'steps');
+		}
+
 		map.addLayer({
 			"id": "slopes_text",
 			"type": "symbol",
