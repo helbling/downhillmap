@@ -2,6 +2,7 @@
 
 import { onMount } from 'svelte';
 import { Map, AttributionControl, GeolocateControl, ScaleControl, Popup } from 'maplibre-gl'
+import AutoComplete from "simple-svelte-autocomplete";
 
 class AboutButton {
 	onAdd(map) {
@@ -32,9 +33,10 @@ class AboutButton {
 }
 
 let mapDiv;
+let map;
 
 onMount(() => {
-	const map = new Map({
+	window.map = map = new Map({
 		container: mapDiv,
 		style: 'https://vectortiles.geo.admin.ch/styles/ch.swisstopo.leichte-basiskarte.vt/style.json',
 		center: [8.94122, 47.3709],
@@ -208,6 +210,25 @@ onMount(() => {
 	map.addControl(new AboutButton());
 
 });
+
+
+async function locationAutocomplete(keyword) {
+	const url = 'http://api3.geo.admin.ch/rest/services/api/SearchServer?type=locations&sr=4326&geometryFormat=geojson&limit=10&searchText=' + encodeURIComponent(keyword);
+
+	const response = await fetch(url);
+	const json = await response.json();
+
+	return json.features;
+}
+
+let selectedLocation;
+
+$: {
+	if (map && selectedLocation) {
+		map.fitBounds(selectedLocation.bbox, { maxZoom: 15 });
+	}
+}
+
 </script>
 
 <svelte:head>
@@ -230,6 +251,20 @@ onMount(() => {
 	:global(.about-button svg) {
 		margin-top:2.5px;
 	}
+	:global(.autocomplete) {
+		min-width:80vw !important;
+		max-width:80vw !important;
+	}
 </style>
 
 <div class="map" bind:this={mapDiv} />
+
+<AutoComplete
+	searchFunction={locationAutocomplete}
+	delay=200
+	localFiltering={false}
+	bind:selectedItem={selectedLocation}
+	labelFunction={item => item ? item.properties.label.replace(/<[^>]*>?/gm, '') : ''}
+	showClear={true}
+	hideArrow={true}
+	/>
