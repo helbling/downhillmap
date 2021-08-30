@@ -2,22 +2,56 @@
 
 import { onMount } from 'svelte';
 import { Map, AttributionControl, GeolocateControl, ScaleControl, Popup } from 'maplibre-gl'
+import SearchButtonIcon from '$lib/SearchButtonIcon.svelte';
 import AutoComplete from "simple-svelte-autocomplete";
+
+let mapDiv;
+let map;
+let searchActive = false;
+let selectedLocation;
+
+$: {
+	if (map && selectedLocation) {
+		map.fitBounds(selectedLocation.bbox, { maxZoom: 15 });
+		searchActive = false;
+	}
+}
+
 
 class AboutButton {
 	onAdd(map) {
 		this._map = map;
-		/*
-		const span = document.createElement('span');
-		span.className = 'maplibregl-ctrl-attrib-button';
-		 */
 
 		const button = document.createElement('button');
-		button.className = 'about-button';
+		button.className = 'custom-button';
 		button.insertAdjacentHTML(
 			'beforeend',
 			`<a href='/about'><svg width='24' height='24' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill-rule='evenodd'><path d='M4 10a6 6 0 1012 0 6 6 0 10-12 0m5-3a1 1 0 102 0 1 1 0 10-2 0m0 3a1 1 0 112 0v3a1 1 0 11-2 0'/></svg></span></a>`
 		);
+		this._container = document.createElement('div');
+		this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group';
+		this._container.appendChild(button);
+
+		return this._container;
+	}
+
+	onRemove() {
+		this._container.parentNode.removeChild(this._container);
+		this._map = undefined;
+	}
+}
+
+class SearchButton {
+	onAdd(map) {
+		this._map = map;
+
+		const button = document.createElement('button');
+		button.className = 'custom-button';
+		this.icon = new SearchButtonIcon({
+			target: button,
+			props: { searchActive }
+		});
+		button.onclick = () => { searchActive = !searchActive };
 
 		this._container = document.createElement('div');
 		this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group';
@@ -32,8 +66,16 @@ class AboutButton {
 	}
 }
 
-let mapDiv;
-let map;
+const searchButton = new SearchButton();
+$: if (searchButton.icon) {
+	searchButton.icon.$set({searchActive});
+}
+$: if (searchActive && window) {
+	window.setTimeout(
+		() => document.querySelector(".location-search input").focus(),
+		100
+	);
+}
 
 onMount(() => {
 	window.map = map = new Map({
@@ -192,25 +234,27 @@ onMount(() => {
 		}
 	});
 
+	map.addControl(searchButton, 'top-right');
 	map.addControl(
-	  new GeolocateControl({
-		positionOptions: {
-		  enableHighAccuracy: true
-		},
-	  })
+		new GeolocateControl({
+			positionOptions: {
+			  enableHighAccuracy: true
+			},
+		}),
+		'top-right',
 	);
 
 	map.addControl(
 		new AttributionControl({
 			compact: false,
-		})
+		}),
+		'bottom-right',
 	);
 
-	map.addControl(new ScaleControl());
-	map.addControl(new AboutButton());
+	map.addControl(new ScaleControl(), 'bottom-left');
+	map.addControl(new AboutButton(), 'top-left');
 
 });
-
 
 async function locationAutocomplete(keyword) {
 	const url = 'http://api3.geo.admin.ch/rest/services/api/SearchServer?type=locations&sr=4326&geometryFormat=geojson&limit=10&searchText=' + encodeURIComponent(keyword);
@@ -220,15 +264,6 @@ async function locationAutocomplete(keyword) {
 
 	return json.features;
 }
-
-let selectedLocation;
-
-$: {
-	if (map && selectedLocation) {
-		map.fitBounds(selectedLocation.bbox, { maxZoom: 15 });
-	}
-}
-
 </script>
 
 <svelte:head>
@@ -243,28 +278,42 @@ $: {
 		left: 0;
 		right: 0;
 	}
-	:global(.about-button a) {
+	:global(.custom-button a) {
 		width:100%;
 		height:100%;
 		display:inline-block;
 	}
-	:global(.about-button svg) {
+	:global(.custom-button svg) {
 		margin-top:2.5px;
 	}
 	:global(.autocomplete) {
-		min-width:80vw !important;
-		max-width:80vw !important;
+		min-width:100% !important;
+	}
+	.location-search {
+		position:absolute;
+		top: 9px;
+		left: 50px;
+		right: 50px;
+		display:none;
+	}
+	.location-search.active {
+		display:block;
 	}
 </style>
 
 <div class="map" bind:this={mapDiv} />
 
-<AutoComplete
-	searchFunction={locationAutocomplete}
-	delay=200
-	localFiltering={false}
-	bind:selectedItem={selectedLocation}
-	labelFunction={item => item ? item.properties.label.replace(/<[^>]*>?/gm, '') : ''}
-	showClear={true}
-	hideArrow={true}
-	/>
+<div
+	class=location-search
+	class:active={searchActive}
+>
+	<AutoComplete
+		searchFunction={locationAutocomplete}
+		delay=200
+		localFiltering={false}
+		bind:selectedItem={selectedLocation}
+		labelFunction={item => item ? item.properties.label.replace(/<[^>]*>?/gm, '') : ''}
+		showClear={true}
+		hideArrow={true}
+		/>
+</div>
