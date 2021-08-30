@@ -257,7 +257,7 @@ onMount(() => {
 });
 
 async function locationAutocomplete(keyword) {
-	const url = 'http://api3.geo.admin.ch/rest/services/api/SearchServer?type=locations&sr=4326&geometryFormat=geojson&limit=10&searchText=' + encodeURIComponent(keyword);
+	const url = 'https://api3.geo.admin.ch/rest/services/api/SearchServer?type=locations&sr=4326&geometryFormat=geojson&limit=10&searchText=' + encodeURIComponent(keyword);
 
 	const response = await fetch(url);
 	const json = await response.json();
