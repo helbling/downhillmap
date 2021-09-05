@@ -27,7 +27,7 @@
 		<h1>About</h1>
 
 		<p>
-			Downhillmap is a map which visualizes the slopes of paths and streets in Switzerland and Liechtenstein with colors. Red is very steep, white is flat.
+			Downhillmap is a map which visualizes the slopes of paths and streets in Switzerland and Liechtenstein with colors. Red is very steep, white is flat. Zoom in to see the steepness in percent.
 		</p>
 
 		<p>
