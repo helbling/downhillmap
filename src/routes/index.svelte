@@ -108,12 +108,17 @@ onMount(() => {
 	});
 
 	map.on('load', () => {
-		map.addSource('slopes', {
+		map.addSource('slope_exact', {
 			"type": "vector",
-			"scheme": "tms",
-			"tiles": [ document.location.origin + "/tile/{z}/{x}/{y}"], // NOTE for develpment: uncomment scheme:tms and use "http://localhost:3000/tile?z={z}&x={x}&y={y}"
+			"tiles": ["http://localhost:3000/tile?z={z}&x={x}&y={y}&layer=slope_exact" ],
 			"minzoom": 12,
 			"maxzoom": 18
+		});
+		map.addSource('slope_avg', {
+			"type": "vector",
+			"tiles": ["http://localhost:3000/tile?z={z}&x={x}&y={y}&layer=slope_avg" ],
+			"minzoom": 11,
+			"maxzoom": 14
 		});
 
 		const slopeStyle = {
@@ -133,11 +138,7 @@ onMount(() => {
 			"layout": {
 				"line-cap": "round",
 			},
-			"filter": [ 'all',
-				[ '==', [ 'geometry-type' ], 'LineString'],
-				//			[ '>=', [ 'get', 'slope' ], 0.05],
-			],
-			"source": "slopes",
+			"source": "slope_exact",
 			"source-layer": "tlm_strasse_slope",
 		};
 
@@ -156,6 +157,14 @@ onMount(() => {
 				isPath,
 			],
 			"id": "slopes_path",
+		}), "road_path");
+		map.addLayer(Object.assign({}, slopeStyle, {
+			"id": "slopes_avg_path",
+			"source": "slope_avg",
+			"source-layer": "tlm_strasse_slope_avg",
+			'minzoom': 8,
+			'maxzoom': 13,
+
 		}), "road_path");
 		map.addLayer(Object.assign({}, slopeStyle, {
 			'filter': [ 'all',
@@ -196,10 +205,10 @@ onMount(() => {
 			map.moveLayer('slopes_path', 'steps');
 		}
 
-		map.addLayer({
-			"id": "slopes_text",
+		const slopesTextExact = {
+			"id": "slopes_text_exact",
 			"type": "symbol",
-			'minzoom': 18,
+			'minzoom': 17,
 			"layout": {
 				"text-field": ['concat', ['to-string', ['round', ['*', 100, ['get', 'slope']]]], '%'],
 				"symbol-placement": "line-center",
@@ -211,9 +220,17 @@ onMount(() => {
 				'text-halo-color':'#fff',
 				'text-halo-width':2,
 			},
-			"source": "slopes",
+			"source": "slope_exact",
 			"source-layer": "tlm_strasse_slope",
-		});
+		};
+		map.addLayer(slopesTextExact);
+		map.addLayer(Object.assign({}, slopesTextExact, {
+			"id": "slopes_text_avg",
+			"minzoom": 16,
+			"maxzoom": 17,
+			"source": "slope_avg",
+			"source-layer": "tlm_strasse_slope_avg",
+		}));
 
 		const popup = new Popup({
 			closeButton: false,

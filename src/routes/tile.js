@@ -3,14 +3,28 @@ import { promisify } from 'util';
 
 var MBTilesPromise = promisify(MBTiles);
 
+const dataLayers = ['slope_avg', 'slope_exact'];
+let mbtiles;
 export async function get({ query }) {
 	const z = parseInt(query.get('z'));
 	const x = parseInt(query.get('x'));
 	const y = parseInt(query.get('y'));
-	const mbtiles = await new MBTilesPromise('var/tlm_strasse_slope.mbtiles?mode=ro');
+	const layer = query.get('layer');
 
 	try {
-		const tile = await promisify(mbtiles.getTile.bind(mbtiles))(z, x, y);
+		if (!mbtiles) {
+			mbtiles = {};
+			for (const dataLayer of dataLayers)
+				mbtiles[dataLayer] = await new MBTilesPromise('var/' + dataLayer + '.mbtiles?mode=ro');
+		}
+
+		const mbtilesLayer = mbtiles[layer];
+		if (!mbtilesLayer)
+			return {
+				status: 404,
+				body: 'Layer not found',
+			};
+		const tile = await promisify(mbtilesLayer.getTile.bind(mbtilesLayer))(z, x, y);
 		return {
 			headers: {
 				'content-encoding': 'gzip',
