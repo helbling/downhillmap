@@ -157,7 +157,7 @@ onMount(() => {
 				isPath,
 			],
 			"id": "slopes_path",
-		}), "road_path");
+		}), "road_path_footway");
 		map.addLayer(Object.assign({}, slopeStyle, {
 			"id": "slopes_avg_path",
 			"source": "slope_avg",
@@ -165,7 +165,7 @@ onMount(() => {
 			'minzoom': 8,
 			'maxzoom': 13,
 
-		}), "road_path");
+		}), "road_path_footway");
 		map.addLayer(Object.assign({}, slopeStyle, {
 			'filter': [ 'all',
 				isLinestring,
@@ -176,10 +176,10 @@ onMount(() => {
 
 
 		// distinguish steps from paths
-		const roadPath = map.getLayer('road_path');
+		const roadPath = map.getLayer('road_path_footway');
 		if (roadPath) {
 			const roadPathFilter = roadPath.filter.slice(); // clone
-			map.setFilter('road_path', ['all', roadPathFilter, ['!=', ['get', 'subclass'], 'steps']]);
+			map.setFilter('road_path_footway', ['all', roadPathFilter, ['!=', ['get', 'subclass'], 'steps']]);
 			
 			const steps = {
 				id: 'steps',
@@ -194,14 +194,14 @@ onMount(() => {
 					"visibility": "visible"
 				},
 				paint: {
-					'line-blur': map.getPaintProperty('road_path', 'line-blur'),
-					'line-color': map.getPaintProperty('road_path', 'line-color'),
-					'line-opacity': map.getPaintProperty('road_path', 'line-opacity'),
-					'line-width': map.getPaintProperty('road_path', 'line-width'),
+					'line-blur': map.getPaintProperty('road_path_footway', 'line-blur'),
+					'line-color': map.getPaintProperty('road_path_footway', 'line-color'),
+					'line-opacity': map.getPaintProperty('road_path_footway', 'line-opacity'),
+					'line-width': map.getPaintProperty('road_path_footway', 'line-width'),
 					'line-dasharray': [1, 1],
 				},
 			};
-			map.addLayer(steps, 'road_path');
+			map.addLayer(steps, 'road_path_footway');
 			map.moveLayer('slopes_path', 'steps');
 		}
 
