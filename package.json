@@ -16,7 +16,7 @@
   "dependencies": {
     "@mapbox/mbtiles": "^0.12.1",
     "@sveltejs/adapter-static": "^1.0.0-next.29",
-    "maplibre-gl": "^2.1.8",
+    "maplibre-gl": "v2.2.0-pre.2",
     "simple-svelte-autocomplete": "^2.3.9"
   }
 }

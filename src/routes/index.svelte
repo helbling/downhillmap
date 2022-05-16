@@ -1,7 +1,7 @@
 <script>
 
 import { onMount } from 'svelte';
-import { Map, AttributionControl, GeolocateControl, ScaleControl, Popup } from 'maplibre-gl'
+import { Map, AttributionControl, GeolocateControl, ScaleControl, Popup, TerrainControl } from 'maplibre-gl'
 import SearchButtonIcon from '$lib/SearchButtonIcon.svelte';
 import AutoComplete from "simple-svelte-autocomplete";
 
@@ -108,6 +108,16 @@ onMount(() => {
 	});
 
 	map.on('load', () => {
+
+		map.addSource('terrain_rgb', {
+			'type': 'raster-dem',
+			'tiles': ['https://vtc-cdn.maptoolkit.net/terrainrgb/{z}/{x}/{y}.webp'],
+			'encoding': 'mapbox',
+			'maxzoom': 14,
+			'minzoom': 4
+		});
+		map.addControl(new TerrainControl({source: 'terrain_rgb', exaggeration: 0.33}), 'top-right');
+
 		map.addSource('slope_exact', {
 			"type": "vector",
 			"tiles": ["http://localhost:3000/tile?z={z}&x={x}&y={y}&layer=slope_exact" ],
