@@ -118,15 +118,16 @@ onMount(() => {
 		});
 		map.addControl(new TerrainControl({source: 'terrain_rgb', exaggeration: 0.33}), 'top-right');
 
+		var origin = (new URL(window.location.href)).origin;
 		map.addSource('slope_exact', {
 			"type": "vector",
-			"tiles": ["http://localhost:3000/tile?z={z}&x={x}&y={y}&layer=slope_exact" ],
+			"tiles": [origin + "/tile?z={z}&x={x}&y={y}&layer=slope_exact" ],
 			"minzoom": 12,
 			"maxzoom": 18
 		});
 		map.addSource('slope_avg', {
 			"type": "vector",
-			"tiles": ["http://localhost:3000/tile?z={z}&x={x}&y={y}&layer=slope_avg" ],
+			"tiles": [origin + "/tile?z={z}&x={x}&y={y}&layer=slope_avg" ],
 			"minzoom": 11,
 			"maxzoom": 14
 		});
