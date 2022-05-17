@@ -108,7 +108,6 @@ onMount(() => {
 	});
 
 	map.on('load', () => {
-
 		map.addSource('terrain_rgb', {
 			'type': 'raster-dem',
 			'tiles': ['https://vtc-cdn.maptoolkit.net/terrainrgb/{z}/{x}/{y}.webp'],
