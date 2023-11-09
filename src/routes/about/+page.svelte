@@ -19,7 +19,7 @@
 </style>
 
 <script>
-		import '../app.css';
+	import '../../app.css';
 </script>
 
 <main>

@@ -1,5 +1,7 @@
 <script>
 
+export const prerender = true;
+
 import { onMount } from 'svelte';
 import { Map, AttributionControl, GeolocateControl, ScaleControl, Popup } from 'maplibre-gl'
 import SearchButtonIcon from '$lib/SearchButtonIcon.svelte';
