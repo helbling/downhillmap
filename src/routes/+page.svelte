@@ -176,17 +176,19 @@ onMount(() => {
 		}), "building_2d");
 
 
+		let mainSource = Object.keys(map.getStyle().sources).filter((x) => x.startsWith('leichtebasiskarte'))[0] ?? 'leichtebasiskarte_v3.0.1';
+
 		// distinguish steps from paths
 		const roadPath = map.getLayer('road_path_footway');
 		if (roadPath) {
 			const roadPathFilter = roadPath.filter.slice(); // clone
 			map.setFilter('road_path_footway', ['all', roadPathFilter, ['!=', ['get', 'subclass'], 'steps']]);
-			
+
 			const steps = {
 				id: 'steps',
 				filter: ['all', roadPathFilter, ['==', ['get', 'subclass'], 'steps']]	,
 				type: "line",
-				source: "swissmaptiles",
+				source: mainSource,
 				"source-layer": "transportation",
 				minzoom: 14,
 				layout: {

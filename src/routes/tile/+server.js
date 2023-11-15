@@ -1,11 +1,13 @@
 import MBTiles from '@mapbox/mbtiles';
 import { promisify } from 'util';
+import { error } from '@sveltejs/kit';
 
 var MBTilesPromise = promisify(MBTiles);
 
 const dataLayers = ['slope_avg', 'slope_exact'];
 let mbtiles;
-export async function get({ url }) {
+
+export async function GET({ url }) {
 	const query = url.searchParams;
 	const z = parseInt(query.get('z'));
 	const x = parseInt(query.get('x'));
@@ -21,23 +23,21 @@ export async function get({ url }) {
 
 		const mbtilesLayer = mbtiles[layer];
 		if (!mbtilesLayer)
-			return {
-				status: 404,
-				body: 'Layer not found',
-			};
+			throw error(404, 'Layer not found');
+
 		const tile = await promisify(mbtilesLayer.getTile.bind(mbtilesLayer))(z, x, y);
-		return {
-			headers: {
-				'content-encoding': 'gzip',
-				'content-type': 'application/vnd.mapbox-vector-tile',
-			},
-			body: tile
-		};
+
+		return new Response(
+			tile,
+			{
+				headers: {
+					'content-encoding': 'gzip',
+					'content-type': 'application/vnd.mapbox-vector-tile',
+				}
+			}
+		);
 	} catch (e) {
-		return {
-			status: 404,
-			body: 'Tile not found',
-		}
+		throw error(404, 'Tile not found');
 	}
 }
 
