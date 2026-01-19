@@ -1,7 +1,7 @@
 <svelte:options namespace=svg />
 
 <script>
-	export let searchActive;
+	let { searchActive } = $props();
 </script>
 
 <svg id="i-search" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="16" height="16" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="4">

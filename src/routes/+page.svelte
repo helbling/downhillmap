@@ -1,21 +1,23 @@
 <script>
+	import { run } from 'svelte/legacy';
 
-import { onMount } from 'svelte';
-import { Map, AttributionControl, GeolocateControl, ScaleControl, Popup } from 'maplibre-gl'
+
+import { onMount, mount } from 'svelte';
+import maplibregl from 'maplibre-gl'
 import SearchButtonIcon from '$lib/SearchButtonIcon.svelte';
 import AutoComplete from "simple-svelte-autocomplete";
 
-let mapDiv;
-let map;
-let searchActive = false;
-let selectedLocation;
+let mapDiv = $state();
+let map = $state();
+let searchActive = $state(false);
+let selectedLocation = $state();
 
-$: {
+run(() => {
 	if (map && selectedLocation) {
 		map.fitBounds(selectedLocation.bbox, { maxZoom: 15 });
 		searchActive = false;
 	}
-}
+});
 
 
 class AboutButton {
@@ -47,7 +49,7 @@ class SearchButton {
 
 		const button = document.createElement('button');
 		button.className = 'custom-button';
-		this.icon = new SearchButtonIcon({
+		this.icon = mount(SearchButtonIcon, {
 			target: button,
 			props: { searchActive }
 		});
@@ -67,20 +69,23 @@ class SearchButton {
 }
 
 const searchButton = new SearchButton();
-$: if (searchButton.icon) {
-	searchButton.icon.$set({searchActive});
-}
-$: if (searchActive && window) {
-	window.setTimeout(
-		() => document.querySelector(".location-search input").focus(),
-		100
-	);
-}
-
+run(() => {
+		if (searchButton.icon) {
+		searchButton.icon.$set({searchActive});
+	}
+});
+run(() => {
+		if (searchActive && window) {
+		window.setTimeout(
+			() => document.querySelector(".location-search input").focus(),
+			100
+		);
+	}
+});
 onMount(() => {
-	window.map = map = new Map({
+	window.map = map = new maplibregl.Map({
 		container: mapDiv,
-		style: 'https://vectortiles.geo.admin.ch/styles/ch.swisstopo.leichte-basiskarte.vt/style.json',
+		style: 'https://vectortiles.geo.admin.ch/styles/ch.swisstopo.lightbasemap.vt/style.json',
 		center: [8.94122, 47.3709],
 		zoom: 15,
 		maxBounds: [
@@ -93,6 +98,7 @@ onMount(() => {
 		attributionControl: false, // added manually further down
 	})
 
+	const roadPathLayerId = 'road_path_footway_ferry';
 	const lineColor = [
 		'interpolate',
 		['linear'],
@@ -158,31 +164,29 @@ onMount(() => {
 				isPath,
 			],
 			"id": "slopes_path",
-		}), "road_path_footway");
+		}), roadPathLayerId);
 		map.addLayer(Object.assign({}, slopeStyle, {
 			"id": "slopes_avg_path",
 			"source": "slope_avg",
 			"source-layer": "tlm_strasse_slope_avg",
 			'minzoom': 8,
 			'maxzoom': 13,
-
-		}), "road_path_footway");
+		}), roadPathLayerId);
 		map.addLayer(Object.assign({}, slopeStyle, {
 			'filter': [ 'all',
 				isLinestring,
 				["!", isPath],
 			],
 			"id": "slopes_street",
-		}), "building_2d");
+		}), "building");
 
-
-		let mainSource = Object.keys(map.getStyle().sources).filter((x) => x.startsWith('leichtebasiskarte'))[0] ?? 'leichtebasiskarte_v3.0.1';
+		let mainSource = Object.keys(map.getStyle().sources).filter((x) => x.startsWith('base'))[0] ?? 'base_v1.0.1';
 
 		// distinguish steps from paths
-		const roadPath = map.getLayer('road_path_footway');
+		const roadPath = map.getLayer(roadPathLayerId);
 		if (roadPath) {
 			const roadPathFilter = roadPath.filter.slice(); // clone
-			map.setFilter('road_path_footway', ['all', roadPathFilter, ['!=', ['get', 'subclass'], 'steps']]);
+			map.setFilter(roadPathLayerId, ['all', roadPathFilter, ['!=', ['get', 'subclass'], 'steps']]);
 
 			const steps = {
 				id: 'steps',
@@ -197,14 +201,14 @@ onMount(() => {
 					"visibility": "visible"
 				},
 				paint: {
-					'line-blur': map.getPaintProperty('road_path_footway', 'line-blur'),
-					'line-color': map.getPaintProperty('road_path_footway', 'line-color'),
-					'line-opacity': map.getPaintProperty('road_path_footway', 'line-opacity'),
-					'line-width': map.getPaintProperty('road_path_footway', 'line-width'),
+					'line-blur': map.getPaintProperty(roadPathLayerId, 'line-blur'),
+					'line-color': map.getPaintProperty(roadPathLayerId, 'line-color'),
+					'line-opacity': map.getPaintProperty(roadPathLayerId, 'line-opacity'),
+					'line-width': map.getPaintProperty(roadPathLayerId, 'line-width'),
 					'line-dasharray': [1, 1],
 				},
 			};
-			map.addLayer(steps, 'road_path_footway');
+			map.addLayer(steps, roadPathLayerId);
 			map.moveLayer('slopes_path', 'steps');
 		}
 
@@ -235,7 +239,7 @@ onMount(() => {
 			"source-layer": "tlm_strasse_slope_avg",
 		}));
 
-		const popup = new Popup({
+		const popup = new maplibregl.Popup({
 			closeButton: false,
 			closeOnClick: false
 		});
@@ -256,7 +260,7 @@ onMount(() => {
 
 	map.addControl(searchButton, 'top-right');
 	map.addControl(
-		new GeolocateControl({
+		new maplibregl.GeolocateControl({
 			positionOptions: {
 			  enableHighAccuracy: true
 			},
@@ -265,13 +269,13 @@ onMount(() => {
 	);
 
 	map.addControl(
-		new AttributionControl({
+		new maplibregl.AttributionControl({
 			compact: false,
 		}),
 		'bottom-right',
 	);
 
-	map.addControl(new ScaleControl(), 'bottom-left');
+	map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
 	map.addControl(new AboutButton(), 'top-left');
 
 });
@@ -321,7 +325,7 @@ async function locationAutocomplete(keyword) {
 	}
 </style>
 
-<div class="map" bind:this={mapDiv} />
+<div class="map" bind:this={mapDiv}></div>
 
 <div
 	class=location-search
