@@ -1,7 +1,7 @@
 <script>
 
 import { onMount } from 'svelte';
-import { Map, AttributionControl, GeolocateControl, ScaleControl, Popup } from 'maplibre-gl'
+import maplibregl from 'maplibre-gl'
 import SearchButtonIcon from '$lib/SearchButtonIcon.svelte';
 import AutoComplete from "simple-svelte-autocomplete";
 
@@ -76,9 +76,8 @@ $: if (searchActive && window) {
 		100
 	);
 }
-
 onMount(() => {
-	window.map = map = new Map({
+	window.map = map = new maplibregl.Map({
 		container: mapDiv,
 		style: 'https://vectortiles.geo.admin.ch/styles/ch.swisstopo.leichte-basiskarte.vt/style.json',
 		center: [8.94122, 47.3709],
@@ -235,7 +234,7 @@ onMount(() => {
 			"source-layer": "tlm_strasse_slope_avg",
 		}));
 
-		const popup = new Popup({
+		const popup = new maplibregl.Popup({
 			closeButton: false,
 			closeOnClick: false
 		});
@@ -256,7 +255,7 @@ onMount(() => {
 
 	map.addControl(searchButton, 'top-right');
 	map.addControl(
-		new GeolocateControl({
+		new maplibregl.GeolocateControl({
 			positionOptions: {
 			  enableHighAccuracy: true
 			},
@@ -265,13 +264,13 @@ onMount(() => {
 	);
 
 	map.addControl(
-		new AttributionControl({
+		new maplibregl.AttributionControl({
 			compact: false,
 		}),
 		'bottom-right',
 	);
 
-	map.addControl(new ScaleControl(), 'bottom-left');
+	map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
 	map.addControl(new AboutButton(), 'top-left');
 
 });
