@@ -2,7 +2,7 @@
   "name": "downhillmap",
   "description": "A map which visualizes the slopes of paths and streets in Switzerland and Liechtenstein with colors",
   "version": "0.0.1",
-  "license" : "GPL-3.0",
+  "license": "GPL-3.0",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@sveltejs/kit": "2.50.0",
-    "svelte": "^5.47.0"
+    "svelte": "^5.47.1"
   },
   "type": "module",
   "dependencies": {

@@ -1,21 +1,23 @@
 <script>
+	import { run } from 'svelte/legacy';
 
-import { onMount } from 'svelte';
+
+import { onMount, mount } from 'svelte';
 import maplibregl from 'maplibre-gl'
 import SearchButtonIcon from '$lib/SearchButtonIcon.svelte';
 import AutoComplete from "simple-svelte-autocomplete";
 
-let mapDiv;
-let map;
-let searchActive = false;
-let selectedLocation;
+let mapDiv = $state();
+let map = $state();
+let searchActive = $state(false);
+let selectedLocation = $state();
 
-$: {
+run(() => {
 	if (map && selectedLocation) {
 		map.fitBounds(selectedLocation.bbox, { maxZoom: 15 });
 		searchActive = false;
 	}
-}
+});
 
 
 class AboutButton {
@@ -47,7 +49,7 @@ class SearchButton {
 
 		const button = document.createElement('button');
 		button.className = 'custom-button';
-		this.icon = new SearchButtonIcon({
+		this.icon = mount(SearchButtonIcon, {
 			target: button,
 			props: { searchActive }
 		});
@@ -67,15 +69,19 @@ class SearchButton {
 }
 
 const searchButton = new SearchButton();
-$: if (searchButton.icon) {
-	searchButton.icon.$set({searchActive});
-}
-$: if (searchActive && window) {
-	window.setTimeout(
-		() => document.querySelector(".location-search input").focus(),
-		100
-	);
-}
+run(() => {
+		if (searchButton.icon) {
+		searchButton.icon.$set({searchActive});
+	}
+});
+run(() => {
+		if (searchActive && window) {
+		window.setTimeout(
+			() => document.querySelector(".location-search input").focus(),
+			100
+		);
+	}
+	});
 onMount(() => {
 	window.map = map = new maplibregl.Map({
 		container: mapDiv,
@@ -320,7 +326,7 @@ async function locationAutocomplete(keyword) {
 	}
 </style>
 
-<div class="map" bind:this={mapDiv} />
+<div class="map" bind:this={mapDiv}></div>
 
 <div
 	class=location-search
